@@ -18,6 +18,11 @@ app.set("view engine", "jsx");
 app.set("views", "./views");
 app.engine("jsx", jsxViewEngine());
 
+// Middleware
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ extended: true }));
+
 //method override
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
@@ -43,6 +48,20 @@ app.get("/vegetables", async (req, res) => {
 	}
 });
 
+// Route for New Vegetable View
 app.get("/vegetables/new", (req, res) => {
 	res.render("vegetables/New");
+});
+
+// Route for Edit Vegetable View
+app.get("/vegetables/:id/edit", async (req, res) => {
+	try {
+		const foundVegetable = await Vegetable.findById(req.params.id);
+		res.render("vegetables/Edit", {
+			vegetables: foundVegetable,
+			id: req.params.id,
+		});
+	} catch (err) {
+		res.send(err).status(400);
+	}
 });
